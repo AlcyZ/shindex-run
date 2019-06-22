@@ -33,7 +33,7 @@ func (r *renderer) id() componentId {
 }
 
 func (r *renderer) update() error {
-	dest := destFromEntity(r.container, r.width, r.height)
+	dest := destFromEntity(r.container)
 	_ = r.renderer.Copy(r.texture, nil, dest)
 	return nil
 }
@@ -86,18 +86,18 @@ func (r *animationRenderer) id() componentId {
 }
 
 func (r *animationRenderer) update() error {
-	dest := destFromEntity(r.container, r.width, r.height)
+	dest := destFromEntity(r.container)
 	if err := r.renderer.Copy(r.animation.texture(), nil, dest); err != nil {
 		return fmt.Errorf("could not render fullscreen texture: %v", err)
 	}
 	return nil
 }
 
-func destFromEntity(e *entity, w int32, h int32) *sdl.Rect {
+func destFromEntity(e *entity) *sdl.Rect {
 	return &sdl.Rect{
 		X: int32(e.position.x),
 		Y: int32(e.position.y),
-		W: w,
-		H: h,
+		W: e.width,
+		H: e.height,
 	}
 }

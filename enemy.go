@@ -6,13 +6,13 @@ import (
 )
 
 const (
-	EnemyHeight = 120
 	EnemyWidth  = 99
+	EnemyHeight = 120
 )
 
 func newEnemy(r *sdl.Renderer, path string) (*entity, error) {
-	initPos := vector{x: screenWidth - 50, y: screenHeight - PlayerHeight - 100}
-	player := newEntity(initPos)
+	initPos := vector{x: screenWidth - 50, y: screenHeight - EnemyHeight - 100}
+	player := newEntity(initPos, EnemyWidth, EnemyHeight)
 
 	renderer, err := newRenderer(player, r, path, EnemyWidth, EnemyHeight)
 	if err != nil {
