@@ -45,7 +45,7 @@ func main() {
 	defer w.Destroy()
 	defer r.Destroy()
 
-	player, err := newPlayer(r, 0.4, "assets/ninja/Idle__000.png")
+	player, err := newPlayer(r, 0.333, "assets/ninja/Idle__000.png")
 	if err != nil {
 		fmt.Println("player init failed: ", err)
 		return
