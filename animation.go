@@ -41,11 +41,6 @@ func (a *animation) texture() *sdl.Texture {
 	return a.textures[a.currentIndex]
 }
 
-// later for multiple animations needed
-//func (a *animation) resetIndex() {
-//	a.currentIndex = 0
-//}
-
 func (a *animation) checkIndex() {
 	if time.Since(a.lastChange) > time.Since(time.Now())+a.changeRate {
 		if a.currentIndex >= a.animationFrames-1 {
