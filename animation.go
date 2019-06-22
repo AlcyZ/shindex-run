@@ -47,7 +47,6 @@ func (a *animation) texture() *sdl.Texture {
 //}
 
 func (a *animation) checkIndex() {
-	println("easy")
 	if time.Since(a.lastChange) > time.Since(time.Now())+a.changeRate {
 		if a.currentIndex >= a.animationFrames-1 {
 			a.currentIndex = 0
