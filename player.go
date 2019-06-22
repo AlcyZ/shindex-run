@@ -10,7 +10,7 @@ const (
 	PlayerWidth  = 99
 )
 
-func newPlayer(r *sdl.Renderer, path string) (*entity, error) {
+func newPlayer(r *sdl.Renderer, speed float64, path string) (*entity, error) {
 	initPos := vector{x: 50, y: screenHeight - PlayerHeight - 100}
 	player := newEntity(initPos)
 
@@ -18,9 +18,10 @@ func newPlayer(r *sdl.Renderer, path string) (*entity, error) {
 	if err != nil {
 		return &entity{}, fmt.Errorf("could not create renderer: %v\n", err)
 	}
-	control := newAdControl(player)
-
-	player.addComponent(control)
+	adControl := newAdControl(player, speed)
+	lrRightControl := newLeftRightControl(player, speed)
+	player.addComponent(adControl)
+	player.addComponent(lrRightControl)
 
 	// the render component should be the last attached, because its very likely that other components updates the
 	// internal state
