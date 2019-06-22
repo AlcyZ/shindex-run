@@ -64,6 +64,35 @@ func (r *fullscreenRenderer) id() componentId {
 	return "fullscreen_renderer"
 }
 
+type animationRenderer struct {
+	container     *entity
+	renderer      *sdl.Renderer
+	animation     *animation
+	width, height int32
+}
+
+func newAnimationRenderer(container *entity, r *sdl.Renderer, animation *animation, width int32, height int32) *animationRenderer {
+	return &animationRenderer{
+		container: container,
+		renderer:  r,
+		animation: animation,
+		width:     width,
+		height:    height,
+	}
+}
+
+func (r *animationRenderer) id() componentId {
+	return "fullscreen_renderer"
+}
+
+func (r *animationRenderer) update() error {
+	dest := destFromEntity(r.container, r.width, r.height)
+	if err := r.renderer.Copy(r.animation.texture(), nil, dest); err != nil {
+		return fmt.Errorf("could not render fullscreen texture: %v", err)
+	}
+	return nil
+}
+
 func destFromEntity(e *entity, w int32, h int32) *sdl.Rect {
 	return &sdl.Rect{
 		X: int32(e.position.x),
