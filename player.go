@@ -7,7 +7,7 @@ import (
 
 const (
 	PlayerHeight = 120
-	PlayerWidth  = 99
+	PlayerWidth  = 63
 )
 
 func newPlayer(r *sdl.Renderer, speed float64, path string) (*entity, error) {

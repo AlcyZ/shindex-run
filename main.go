@@ -45,9 +45,15 @@ func main() {
 	defer w.Destroy()
 	defer r.Destroy()
 
-	player, err := newPlayer(r, 0.75, "assets/player/male/Idle_0.png")
+	player, err := newPlayer(r, 0.4, "assets/ninja/Idle__000.png")
 	if err != nil {
 		fmt.Println("player init failed: ", err)
+		return
+	}
+
+	enemy, err := newEnemy(r, "assets/player/male/Idle_0.png")
+	if err != nil {
+		fmt.Println("enemy init failed: ", err)
 		return
 	}
 
@@ -59,6 +65,7 @@ func main() {
 
 	entities = append(entities, background)
 	entities = append(entities, player)
+	entities = append(entities, enemy)
 
 	for {
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
