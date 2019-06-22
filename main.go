@@ -3,13 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"time"
 )
 
 const (
 	screenWidth  = 1200
 	screenHeight = 800
+
+	deltaTicks = 60
+	maxFps     = 240
 )
 
+var delta float64
 var entities []*entity
 
 //var sys [] systems.System
@@ -45,7 +50,7 @@ func main() {
 	defer w.Destroy()
 	defer r.Destroy()
 
-	player, err := newPlayer(r, 0.333, "assets/ninja/Idle__000.png")
+	player, err := newPlayer(r, 6, "assets/ninja/Idle__000.png")
 	if err != nil {
 		fmt.Println("player init failed: ", err)
 		return
@@ -68,6 +73,7 @@ func main() {
 	entities = append(entities, enemy)
 
 	for {
+		frameRenderBegin := time.Now()
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event.(type) {
 			case *sdl.QuitEvent:
@@ -86,5 +92,7 @@ func main() {
 		}
 
 		r.Present()
+		time.Sleep(time.Second / maxFps) // some hack to reduce resource usage
+		delta = time.Since(frameRenderBegin).Seconds() * deltaTicks
 	}
 }
