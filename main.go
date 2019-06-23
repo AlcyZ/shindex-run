@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/faiface/beep"
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
 	"github.com/veandco/go-sdl2/sdl"
+	"os"
 	"time"
 )
 
@@ -43,28 +47,37 @@ func boot() (*sdl.Window, *sdl.Renderer, error) {
 func main() {
 	w, r, err := boot()
 	if err != nil {
-		fmt.Printf("could not boot: \n%v", err)
+		fmt.Printf("could not boot:\n%v", err)
 		return
 	}
 	defer sdl.Quit()
 	defer w.Destroy()
 	defer r.Destroy()
 
+	soundStream, err := initAndPlaySound("sounds/Yung_Kartz_-_05_-_Loyalty.mp3")
+	if err != nil {
+		fmt.Println("sound init failed:\n", err)
+		return
+	}
+	defer soundStream.Close()
+
+	fmt.Println(soundStream)
+
 	player, err := newPlayer(r, 16, "assets/ninja/Idle__000.png")
 	if err != nil {
-		fmt.Println("player init failed: \n", err)
+		fmt.Println("player init failed:\n", err)
 		return
 	}
 
 	enemy, err := newEnemy(r, "assets/player/male/Idle_0.png")
 	if err != nil {
-		fmt.Println("enemy init failed: \n", err)
+		fmt.Println("enemy init failed:\n", err)
 		return
 	}
 
 	background, err := newBackground(r, "assets/background.jpg")
 	if err != nil {
-		fmt.Println("bg init failed: \n", err)
+		fmt.Println("bg init failed:\n", err)
 		return
 	}
 
@@ -95,4 +108,24 @@ func main() {
 		time.Sleep(time.Second / maxFps) // some hack to reduce resource usage
 		delta = time.Since(frameRenderBegin).Seconds() * deltaTicks
 	}
+}
+
+func initAndPlaySound(path string) (beep.StreamSeekCloser, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("could not open mp3 file: %v", err)
+	}
+
+	streamer, format, err := mp3.Decode(f)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode mp3: %v", err)
+	}
+
+	if err := speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10)); err != nil {
+		return nil, fmt.Errorf("could not init speaker: %v", err)
+	}
+
+	speaker.Play(streamer)
+
+	return streamer, nil
 }
