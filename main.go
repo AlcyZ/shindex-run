@@ -22,19 +22,19 @@ var entities []*entity
 func boot() (*sdl.Window, *sdl.Renderer, error) {
 	// init sdl
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not init SDL: %v", err)
+		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not init SDL: \n%v", err)
 	}
 
 	// create window
 	w, err := sdl.CreateWindow("Runner", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, screenWidth, screenHeight, sdl.WINDOW_OPENGL)
 	if err != nil {
-		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create window: %v", err)
+		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create window: \n%v", err)
 	}
 
 	// create renderer
 	r, err := sdl.CreateRenderer(w, -1, sdl.RENDERER_ACCELERATED)
 	if err != nil {
-		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create r: %v", err)
+		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create r: \n%v", err)
 	}
 
 	return w, r, nil
@@ -43,34 +43,34 @@ func boot() (*sdl.Window, *sdl.Renderer, error) {
 func main() {
 	w, r, err := boot()
 	if err != nil {
-		fmt.Printf("could not boot: %v", err)
+		fmt.Printf("could not boot: \n%v", err)
 		return
 	}
 	defer sdl.Quit()
 	defer w.Destroy()
 	defer r.Destroy()
 
-	player, err := newPlayer(r, 6, "assets/ninja/Idle__000.png")
+	player, err := newPlayer(r, 16, "assets/ninja/Idle__000.png")
 	if err != nil {
-		fmt.Println("player init failed: ", err)
+		fmt.Println("player init failed: \n", err)
 		return
 	}
 
 	enemy, err := newEnemy(r, "assets/player/male/Idle_0.png")
 	if err != nil {
-		fmt.Println("enemy init failed: ", err)
+		fmt.Println("enemy init failed: \n", err)
 		return
 	}
 
 	background, err := newBackground(r, "assets/background.jpg")
 	if err != nil {
-		fmt.Println("bg init failed: ", err)
+		fmt.Println("bg init failed: \n", err)
 		return
 	}
 
 	entities = append(entities, background)
-	entities = append(entities, player)
 	entities = append(entities, enemy)
+	entities = append(entities, player)
 
 	for {
 		frameRenderBegin := time.Now()

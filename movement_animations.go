@@ -29,8 +29,8 @@ func (movement *movementAnimations) add(animation *animation, flip sdl.RendererF
 	movement.flips[t] = flip
 }
 
-func (movement *movementAnimations) texture(t movementType) *sdl.Texture {
-	return movement.animations[t].texture()
+func (movement *movementAnimations) layout(t movementType) *layout {
+	return movement.animations[t].layout()
 }
 
 func (movement *movementAnimations) updateAnimation(t movementType) {

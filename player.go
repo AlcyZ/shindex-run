@@ -7,22 +7,17 @@ import (
 	"time"
 )
 
-const (
-	PlayerWidth  = 63
-	PlayerHeight = 120
-)
-
 func newPlayer(r *sdl.Renderer, speed float64, path string) (*entity, error) {
-	initPos := vector{x: 50, y: screenHeight - PlayerHeight - 100}
-	player := newEntity(initPos, PlayerWidth, PlayerHeight)
+	initPos := vector{x: 50, y: screenHeight - 220}
+	player := newEntity(initPos)
 
 	idleAnimation, err := getPlayerIdleAnimation(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create player idle animation: %v\n", err)
+		return &entity{}, fmt.Errorf("could not create player idle animation: \n%v", err)
 	}
 	runAnimation, err := getPlayerRunAnimation(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create player run animation: %v\n", err)
+		return &entity{}, fmt.Errorf("could not create player run animation: \n%v", err)
 	}
 	movementAnimations := newMovementAnimations()
 	movementAnimations.add(idleAnimation, sdl.FLIP_NONE, MovementIdle)
@@ -40,7 +35,7 @@ func newPlayer(r *sdl.Renderer, speed float64, path string) (*entity, error) {
 	// internal state to be rendered
 	renderer, err := newMovementAnimationRenderer(player, r, MovementIdle)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create movement animation renderer: %v\n", err)
+		return &entity{}, fmt.Errorf("could not create movement animation renderer: \n%v", err)
 	}
 	player.addComponent(renderer)
 
@@ -54,13 +49,18 @@ func getPlayerIdleAnimation(container *entity, r *sdl.Renderer) (*animation, err
 		path := fmt.Sprintf("assets/ninja/Idle__00%d.png", i)
 		txt, err := img.LoadTexture(r, path)
 		if err != nil {
-			return &animation{}, fmt.Errorf("could not load player idle texture %v, %v", i, err)
+			return &animation{}, fmt.Errorf("could not load player idle texture %v, \n%v", i, err)
 		}
 
 		idleTxt = append(idleTxt, txt)
 	}
 
-	return newAnimation(container, idleTxt, time.Second), nil
+	anim, err := newAnimation(container, idleTxt, time.Second, 0.25)
+	if err != nil {
+		return &animation{}, fmt.Errorf("could not create idle animation: \n%v", err)
+	}
+
+	return anim, nil
 }
 
 func getPlayerRunAnimation(container *entity, r *sdl.Renderer) (*animation, error) {
@@ -70,11 +70,16 @@ func getPlayerRunAnimation(container *entity, r *sdl.Renderer) (*animation, erro
 		path := fmt.Sprintf("assets/ninja/Run__00%d.png", i)
 		txt, err := img.LoadTexture(r, path)
 		if err != nil {
-			return &animation{}, fmt.Errorf("could not load player run texture %v, %v", i, err)
+			return &animation{}, fmt.Errorf("could not load player run texture %v, \n%v", i, err)
 		}
 
 		runTxt = append(runTxt, txt)
 	}
 
-	return newAnimation(container, runTxt, time.Second), nil
+	anim, err := newAnimation(container, runTxt, time.Second, 0.25)
+	if err != nil {
+		return &animation{}, fmt.Errorf("could not create run animation: \n%v", err)
+	}
+
+	return anim, nil
 }

@@ -1,13 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"time"
 )
 
+const AnimationId = "animation"
+
+type layout struct {
+	texture *sdl.Texture
+	width   int32
+	height  int32
+}
+
 type animation struct {
 	container       *entity
-	textures        []*sdl.Texture
+	layouts         []*layout
 	lastChange      time.Time
 	changeRate      time.Duration
 	animationFrames int
@@ -15,20 +24,35 @@ type animation struct {
 	currentIndex    int
 }
 
-func newAnimation(container *entity, textures []*sdl.Texture, duration time.Duration) *animation {
+func newAnimation(container *entity, textures []*sdl.Texture, duration time.Duration, scaling float64) (*animation, error) {
+	var layouts []*layout
 	frames := len(textures)
+
+	for _, texture := range textures {
+		_, _, width, height, err := texture.Query()
+		if err != nil {
+			return &animation{}, fmt.Errorf("could not query widht and height from texture: \n%v", err)
+		}
+
+		layout := &layout{
+			texture: texture,
+			width:   int32(float64(width) * scaling),
+			height:  int32(float64(height) * scaling),
+		}
+		layouts = append(layouts, layout)
+	}
 
 	return &animation{
 		container:       container,
-		textures:        textures,
+		layouts:         layouts,
 		duration:        duration,
 		animationFrames: frames,
 		changeRate:      duration / time.Duration(frames),
-	}
+	}, nil
 }
 
 func (a *animation) id() componentId {
-	return "animation"
+	return AnimationId
 }
 
 func (a *animation) update() error {
@@ -37,8 +61,8 @@ func (a *animation) update() error {
 	return nil
 }
 
-func (a *animation) texture() *sdl.Texture {
-	return a.textures[a.currentIndex]
+func (a *animation) layout() *layout {
+	return a.layouts[a.currentIndex]
 }
 
 func (a *animation) checkIndex() {

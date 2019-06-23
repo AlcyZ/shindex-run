@@ -17,7 +17,7 @@ type movementAnimationRenderer struct {
 func newMovementAnimationRenderer(container *entity, renderer *sdl.Renderer, initType movementType) (*movementAnimationRenderer, error) {
 	moveAnimations, err := container.getComponent(MovementAnimationsId)
 	if err != nil {
-		return &movementAnimationRenderer{}, fmt.Errorf("component movement_animation_renderer depends on other component: %v", err)
+		return &movementAnimationRenderer{}, fmt.Errorf("component movement_animation_renderer depends on other component: \n%v", err)
 	}
 
 	return &movementAnimationRenderer{
@@ -34,15 +34,20 @@ func (r *movementAnimationRenderer) id() componentId {
 
 func (r *movementAnimationRenderer) update() error {
 	t := r.currentMovement
-
+	layout := r.movement.layout(t)
 	flip := r.movement.flips[t]
-	texture := r.movement.texture(t)
-	dest := destFromEntity(r.container)
+
+	dest := &sdl.Rect{
+		X: int32(r.container.position.x),
+		Y: int32(r.container.position.y),
+		W: layout.width,
+		H: layout.height,
+	}
 
 	r.movement.updateAnimation(t)
 
-	if err := r.renderer.CopyEx(texture, nil, dest, 0, nil, flip); err != nil {
-		return fmt.Errorf("could not render texture to window: %v", err)
+	if err := r.renderer.CopyEx(layout.texture, nil, dest, 0, nil, flip); err != nil {
+		return fmt.Errorf("could not render texture to window: \n%v", err)
 	}
 
 	return nil
