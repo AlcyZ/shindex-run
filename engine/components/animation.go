@@ -1,4 +1,4 @@
-package main
+package components
 
 import (
 	"fmt"
@@ -7,17 +7,17 @@ import (
 	"time"
 )
 
-const AnimationId engine.ComponentId = "animation"
+const AnimationId engine.ComponentId = "Animation"
 
-type layout struct {
+type Layout struct {
 	texture *sdl.Texture
 	width   int32
 	height  int32
 }
 
-type animation struct {
+type Animation struct {
 	container       *engine.Entity
-	layouts         []*layout
+	layouts         []*Layout
 	lastChange      time.Time
 	changeRate      time.Duration
 	animationFrames int
@@ -25,17 +25,17 @@ type animation struct {
 	currentIndex    int
 }
 
-func newAnimation(container *engine.Entity, textures []*sdl.Texture, duration time.Duration, scaling float64) (*animation, error) {
-	var layouts []*layout
+func NewAnimation(container *engine.Entity, textures []*sdl.Texture, duration time.Duration, scaling float64) (*Animation, error) {
+	var layouts []*Layout
 	frames := len(textures)
 
 	for _, texture := range textures {
 		_, _, width, height, err := texture.Query()
 		if err != nil {
-			return &animation{}, fmt.Errorf("could not query widht and height from texture: \n%v", err)
+			return &Animation{}, fmt.Errorf("could not query widht and height from texture: \n%v", err)
 		}
 
-		layout := &layout{
+		layout := &Layout{
 			texture: texture,
 			width:   int32(float64(width) * scaling),
 			height:  int32(float64(height) * scaling),
@@ -43,7 +43,7 @@ func newAnimation(container *engine.Entity, textures []*sdl.Texture, duration ti
 		layouts = append(layouts, layout)
 	}
 
-	return &animation{
+	return &Animation{
 		container:       container,
 		layouts:         layouts,
 		duration:        duration,
@@ -52,21 +52,21 @@ func newAnimation(container *engine.Entity, textures []*sdl.Texture, duration ti
 	}, nil
 }
 
-func (a *animation) Id() engine.ComponentId {
+func (a *Animation) Id() engine.ComponentId {
 	return AnimationId
 }
 
-func (a *animation) Update() error {
+func (a *Animation) Update() error {
 	a.checkIndex()
 
 	return nil
 }
 
-func (a *animation) layout() *layout {
+func (a *Animation) Layout() *Layout {
 	return a.layouts[a.currentIndex]
 }
 
-func (a *animation) checkIndex() {
+func (a *Animation) checkIndex() {
 	if time.Since(a.lastChange) > time.Since(time.Now())+a.changeRate {
 		if a.currentIndex >= a.animationFrames-1 {
 			a.currentIndex = 0

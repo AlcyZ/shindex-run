@@ -1,4 +1,4 @@
-package main
+package components
 
 import (
 	"fmt"
@@ -6,21 +6,21 @@ import (
 	"shindex-run/engine"
 )
 
-type fullscreenRenderer struct {
+type FullscreenRenderer struct {
 	container *engine.Entity
 	renderer  *sdl.Renderer
 	texture   *sdl.Texture
 }
 
-func newFullscreenRenderer(container *engine.Entity, renderer *sdl.Renderer, texture *sdl.Texture) *fullscreenRenderer {
-	return &fullscreenRenderer{
+func NewFullscreenRenderer(container *engine.Entity, renderer *sdl.Renderer, texture *sdl.Texture) *FullscreenRenderer {
+	return &FullscreenRenderer{
 		container: container,
 		renderer:  renderer,
 		texture:   texture,
 	}
 }
 
-func (r *fullscreenRenderer) Update() error {
+func (r *FullscreenRenderer) Update() error {
 	if err := r.renderer.Copy(r.texture, nil, nil); err != nil {
 		return fmt.Errorf("could not render fullscreen texture: \n%v", err)
 	}
@@ -28,35 +28,35 @@ func (r *fullscreenRenderer) Update() error {
 	return nil
 }
 
-func (r *fullscreenRenderer) Id() engine.ComponentId {
+func (r *FullscreenRenderer) Id() engine.ComponentId {
 	return "fullscreen_renderer"
 }
 
-type animationRenderer struct {
+type AnimationRenderer struct {
 	container *engine.Entity
 	renderer  *sdl.Renderer
-	animation *animation
+	animation *Animation
 }
 
-func newAnimationRenderer(container *engine.Entity, r *sdl.Renderer) (*animationRenderer, error) {
+func NewAnimationRenderer(container *engine.Entity, r *sdl.Renderer) (*AnimationRenderer, error) {
 	anim, err := container.GetComponent(AnimationId)
 	if err != nil {
-		return &animationRenderer{}, fmt.Errorf("could not create animation renderer: \n%v", err)
+		return &AnimationRenderer{}, fmt.Errorf("could not create Animation renderer: \n%v", err)
 	}
 
-	return &animationRenderer{
+	return &AnimationRenderer{
 		container: container,
 		renderer:  r,
-		animation: anim.(*animation),
+		animation: anim.(*Animation),
 	}, nil
 }
 
-func (r *animationRenderer) Id() engine.ComponentId {
+func (r *AnimationRenderer) Id() engine.ComponentId {
 	return "fullscreen_renderer"
 }
 
-func (r *animationRenderer) Update() error {
-	layout := r.animation.layout()
+func (r *AnimationRenderer) Update() error {
+	layout := r.animation.Layout()
 	position := r.container.CurrentPosition()
 	dest := &sdl.Rect{
 		X: int32(position.X),

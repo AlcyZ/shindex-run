@@ -8,42 +8,9 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"os"
 	"shindex-run/engine"
+	gameEntities "shindex-run/engine/entities"
 	"time"
 )
-
-const (
-	screenWidth  = 1200
-	screenHeight = 800
-
-	deltaTicks = 60
-	maxFps     = 240
-)
-
-var delta float64
-var entities []*engine.Entity
-
-//var sys [] systems.System
-
-func boot() (*sdl.Window, *sdl.Renderer, error) {
-	// init sdl
-	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not init SDL: \n%v", err)
-	}
-
-	// create window
-	w, err := sdl.CreateWindow("Runner", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, screenWidth, screenHeight, sdl.WINDOW_OPENGL)
-	if err != nil {
-		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create window: \n%v", err)
-	}
-
-	// create renderer
-	r, err := sdl.CreateRenderer(w, -1, sdl.RENDERER_ACCELERATED)
-	if err != nil {
-		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create r: \n%v", err)
-	}
-
-	return w, r, nil
-}
 
 func main() {
 	w, r, err := boot()
@@ -62,53 +29,52 @@ func main() {
 	}
 	defer soundStream.Close()
 
-	//soundStream.Close()
+	game := engine.CreateSimpleGame(w, r)
 
-	player, err := newPlayer(r, 16, "assets/ninja/Idle__000.png")
+	player, err := gameEntities.NewPlayer(game, r, 16, "assets/ninja/Idle__000.png")
 	if err != nil {
 		fmt.Println("player init failed:\n", err)
 		return
 	}
 
-	enemy, err := newEnemy(r, "assets/player/male/Idle_0.png")
+	enemy, err := gameEntities.NewEnemy(game, r, "assets/player/male/Idle_0.png")
 	if err != nil {
 		fmt.Println("enemy init failed:\n", err)
 		return
 	}
 
-	background, err := newBackground(r, "assets/background.jpg")
+	background, err := gameEntities.NewBackground(game, r, "assets/background.jpg")
 	if err != nil {
 		fmt.Println("bg init failed:\n", err)
 		return
 	}
 
-	entities = append(entities, background)
-	entities = append(entities, enemy)
-	entities = append(entities, player)
+	game.AddEntity(background)
+	game.AddEntity(enemy)
+	game.AddEntity(player)
 
-	for {
-		frameRenderBegin := time.Now()
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				println("End game!")
-				return
-			}
-		}
+	game.Start()
+}
 
-		_ = r.SetDrawColor(255, 255, 255, 0)
-		_ = r.Clear()
-
-		for _, entity := range entities {
-			if err := entity.Update(); err != nil {
-				fmt.Println("could not update entity: ", err)
-			}
-		}
-
-		r.Present()
-		time.Sleep(time.Second / maxFps) // some hack to reduce resource usage
-		delta = time.Since(frameRenderBegin).Seconds() * deltaTicks
+func boot() (*sdl.Window, *sdl.Renderer, error) {
+	// init sdl
+	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not init SDL: \n%v", err)
 	}
+
+	// create window
+	w, err := sdl.CreateWindow("Runner", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, engine.ScreenWidth, engine.ScreenHeight, sdl.WINDOW_OPENGL)
+	if err != nil {
+		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create window: \n%v", err)
+	}
+
+	// create renderer
+	r, err := sdl.CreateRenderer(w, -1, sdl.RENDERER_ACCELERATED)
+	if err != nil {
+		return &sdl.Window{}, &sdl.Renderer{}, fmt.Errorf("could not create r: \n%v", err)
+	}
+
+	return w, r, nil
 }
 
 func initAndPlaySound(path string) (beep.StreamSeekCloser, error) {

@@ -13,14 +13,16 @@ func NewVector(x float64, y float64) Vector {
 }
 
 type Entity struct {
+	game       *Game
 	position   Vector
 	components map[ComponentId]Component
 }
 
-func NewEntity(position Vector) *Entity {
+func NewEntity(game *Game, position Vector) *Entity {
 	var components = make(map[ComponentId]Component)
 
 	return &Entity{
+		game:       game,
 		position:   position,
 		components: components,
 	}
@@ -55,4 +57,8 @@ func (e *Entity) ChangePosition(position Vector) {
 
 func (e *Entity) CurrentPosition() Vector {
 	return e.position
+}
+
+func (e *Entity) GetDelta() float64 {
+	return e.game.Delta()
 }

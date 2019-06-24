@@ -1,4 +1,4 @@
-package main
+package components
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ const AnimationsRendererId = "animations_renderer"
 type animationsRenderer struct {
 	container *engine.Entity
 	r         *sdl.Renderer
-	a         *animations
+	a         *Animations
 }
 
-func newAnimationsRenderer(container *engine.Entity, r *sdl.Renderer) (*animationsRenderer, error) {
+func NewAnimationsRenderer(container *engine.Entity, r *sdl.Renderer) (*animationsRenderer, error) {
 	a, err := container.GetComponent(AnimationsId)
 	if err != nil {
 		return &animationsRenderer{}, fmt.Errorf("could not get component:\n%v", err)
@@ -23,7 +23,7 @@ func newAnimationsRenderer(container *engine.Entity, r *sdl.Renderer) (*animatio
 	return &animationsRenderer{
 		container: container,
 		r:         r,
-		a:         a.(*animations),
+		a:         a.(*Animations),
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (r *animationsRenderer) Id() engine.ComponentId {
 func (r *animationsRenderer) Update() error {
 	t := r.a.current
 	position := r.container.CurrentPosition()
-	layout := r.a.layout(t)
+	layout := r.a.Layout(t)
 	flip := r.a.flips[t]
 
 	dest := &sdl.Rect{

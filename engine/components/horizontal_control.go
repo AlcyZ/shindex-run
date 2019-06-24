@@ -1,4 +1,4 @@
-package main
+package components
 
 import (
 	"fmt"
@@ -13,17 +13,17 @@ const (
 	mappingKeyRight     = "right"
 )
 
-type horizontalControl struct {
+type HorizontalControl struct {
 	container        *engine.Entity
 	speed            float64
 	leftKeys         []sdl.Scancode
 	rightKeys        []sdl.Scancode
 	animated         bool
-	animationMapping map[string]animationType
+	animationMapping map[string]AnimationType
 }
 
-func newHorizontalControl(container *engine.Entity, speed float64, leftKeys []sdl.Scancode, rightKeys []sdl.Scancode) *horizontalControl {
-	return &horizontalControl{
+func NewHorizontalControl(container *engine.Entity, speed float64, leftKeys []sdl.Scancode, rightKeys []sdl.Scancode) *HorizontalControl {
+	return &HorizontalControl{
 		container: container,
 		speed:     speed,
 		leftKeys:  leftKeys,
@@ -32,12 +32,12 @@ func newHorizontalControl(container *engine.Entity, speed float64, leftKeys []sd
 	}
 }
 
-func (c *horizontalControl) withAnimations(idle animationType, left animationType, right animationType) error {
+func (c *HorizontalControl) WithAnimations(idle AnimationType, left AnimationType, right AnimationType) error {
 	_, err := c.container.GetComponent(AnimationsId)
 	if err != nil {
 		return fmt.Errorf("animations not available on container entity: %v", err)
 	}
-	mapping := make(map[string]animationType)
+	mapping := make(map[string]AnimationType)
 	c.animationMapping = mapping
 
 	c.animationMapping[mappingKeyIdle] = idle
@@ -48,13 +48,14 @@ func (c *horizontalControl) withAnimations(idle animationType, left animationTyp
 	return nil
 }
 
-func (c *horizontalControl) Id() engine.ComponentId {
+func (c *HorizontalControl) Id() engine.ComponentId {
 	return HorizontalControlId
 }
 
-func (c *horizontalControl) Update() error {
+func (c *HorizontalControl) Update() error {
 	keys := sdl.GetKeyboardState()
 	position := c.container.CurrentPosition()
+	delta := c.container.GetDelta()
 	leftKeyPressed := false
 	rightKeyPressed := false
 	nonOrBoth := false
@@ -76,17 +77,17 @@ func (c *horizontalControl) Update() error {
 
 	nonOrBoth = (leftKeyPressed && rightKeyPressed) || (!leftKeyPressed && !rightKeyPressed)
 	if nonOrBoth {
-		// set idle animation
+		// set idle Animation
 		c.changeAnimation(mappingKeyIdle)
 	}
 
 	return nil
 }
 
-func (c *horizontalControl) changeAnimation(t string) {
+func (c *HorizontalControl) changeAnimation(t string) {
 	if c.animated {
-		//a if animated is true, the animations component must be available
+		//a if animated is true, the Animations component must be available
 		comp, _ := c.container.GetComponent(AnimationsId)
-		comp.(*animations).changeAnimation(c.animationMapping[t])
+		comp.(*Animations).ChangeAnimation(c.animationMapping[t])
 	}
 }
