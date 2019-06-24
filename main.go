@@ -61,7 +61,7 @@ func main() {
 	}
 	defer soundStream.Close()
 
-	fmt.Println(soundStream)
+	//soundStream.Close()
 
 	player, err := newPlayer(r, 16, "assets/ninja/Idle__000.png")
 	if err != nil {

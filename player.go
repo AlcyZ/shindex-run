@@ -19,23 +19,30 @@ func newPlayer(r *sdl.Renderer, speed float64, path string) (*entity, error) {
 	if err != nil {
 		return &entity{}, fmt.Errorf("could not create player run animation: \n%v", err)
 	}
-	movementAnimations := newMovementAnimations()
-	movementAnimations.add(idleAnimation, sdl.FLIP_NONE, MovementIdle)
-	movementAnimations.add(runAnimation, sdl.FLIP_HORIZONTAL, MovementLeft)
-	movementAnimations.add(runAnimation, sdl.FLIP_NONE, MovementRight)
 
-	adControl := newAdControl(player, speed)
-	lrRightControl := newLeftRightControl(player, speed)
+	var idle = "idle"
+	var left = "left"
+	var right = "right"
 
-	player.addComponent(adControl)
-	player.addComponent(lrRightControl)
-	player.addComponent(movementAnimations)
+	animations := newAnimations()
+	animations.add(idleAnimation, sdl.FLIP_NONE, idle)
+	animations.add(runAnimation, sdl.FLIP_HORIZONTAL, left)
+	animations.add(runAnimation, sdl.FLIP_NONE, right)
+	player.addComponent(animations)
+
+	control := newHorizontalControl(player, speed, getLeftKeys(), getRightKeys())
+	err = control.withAnimations(idle, left, right) // animations must be attach to player component first
+	if err != nil {
+		return &entity{}, fmt.Errorf("could not add animations to horizontal control: \n%v", err)
+	}
+
+	player.addComponent(control)
 
 	// the render component should be the last attached, because its very likely that other components updates the
 	// internal state to be rendered
-	renderer, err := newMovementAnimationRenderer(player, r, MovementIdle)
+	renderer, err := newAnimationsRenderer(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create movement animation renderer: \n%v", err)
+		return &entity{}, fmt.Errorf("could not create animations renderer: \n%v", err)
 	}
 	player.addComponent(renderer)
 
@@ -82,4 +89,22 @@ func getPlayerRunAnimation(container *entity, r *sdl.Renderer) (*animation, erro
 	}
 
 	return anim, nil
+}
+
+func getLeftKeys() []sdl.Scancode {
+	keys := make([]sdl.Scancode, 2)
+
+	keys = append(keys, sdl.SCANCODE_A)
+	keys = append(keys, sdl.SCANCODE_LEFT)
+
+	return keys
+}
+
+func getRightKeys() []sdl.Scancode {
+	keys := make([]sdl.Scancode, 2)
+
+	keys = append(keys, sdl.SCANCODE_D)
+	keys = append(keys, sdl.SCANCODE_RIGHT)
+
+	return keys
 }

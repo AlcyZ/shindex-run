@@ -30,7 +30,7 @@ func (e *entity) getComponent(id componentId) (component, error) {
 		return val, nil
 	}
 
-	return nil, fmt.Errorf("could not find component: \n%v", id)
+	return nil, fmt.Errorf("could not find component: \n%v, [%v]", id, e.components)
 }
 
 func (e *entity) update() error {
