@@ -35,7 +35,6 @@ func (r *animationsRenderer) Update() error {
 	t := r.a.current
 	position := r.container.CurrentPosition()
 	layout := r.a.Layout(t)
-	flip := r.a.flips[t]
 
 	dest := &sdl.Rect{
 		X: int32(position.X),
@@ -44,7 +43,7 @@ func (r *animationsRenderer) Update() error {
 		H: layout.height,
 	}
 
-	if err := r.r.CopyEx(layout.texture, nil, dest, 0, nil, flip); err != nil {
+	if err := r.r.CopyEx(layout.texture, nil, dest, 0, nil, layout.flip); err != nil {
 		return fmt.Errorf("could not render texture to window: \n%v", err)
 	}
 

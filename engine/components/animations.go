@@ -27,9 +27,8 @@ func NewAnimations(container *engine.Entity) *Animations {
 	}
 }
 
-func (a *Animations) Add(animation *Animation, flip sdl.RendererFlip, t AnimationType) {
+func (a *Animations) Add(animation *Animation, t AnimationType) {
 	a.animations[t] = animation
-	a.flips[t] = flip
 
 	if a.current == "" {
 		a.current = t

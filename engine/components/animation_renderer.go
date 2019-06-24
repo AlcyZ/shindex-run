@@ -6,32 +6,6 @@ import (
 	"shindex-run/engine"
 )
 
-type FullscreenRenderer struct {
-	container *engine.Entity
-	renderer  *sdl.Renderer
-	texture   *sdl.Texture
-}
-
-func NewFullscreenRenderer(container *engine.Entity, renderer *sdl.Renderer, texture *sdl.Texture) *FullscreenRenderer {
-	return &FullscreenRenderer{
-		container: container,
-		renderer:  renderer,
-		texture:   texture,
-	}
-}
-
-func (r *FullscreenRenderer) Update() error {
-	if err := r.renderer.Copy(r.texture, nil, nil); err != nil {
-		return fmt.Errorf("could not render fullscreen texture: \n%v", err)
-	}
-
-	return nil
-}
-
-func (r *FullscreenRenderer) Id() engine.ComponentId {
-	return "fullscreen_renderer"
-}
-
 type AnimationRenderer struct {
 	container *engine.Entity
 	renderer  *sdl.Renderer
@@ -64,7 +38,7 @@ func (r *AnimationRenderer) Update() error {
 		W: layout.width,
 		H: layout.height,
 	}
-	if err := r.renderer.Copy(layout.texture, nil, dest); err != nil {
+	if err := r.renderer.CopyEx(layout.texture, nil, dest, 0, nil, layout.flip); err != nil {
 		return fmt.Errorf("could not render fullscreen texture: \n%v", err)
 	}
 	return nil

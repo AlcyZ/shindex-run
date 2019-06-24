@@ -40,7 +40,7 @@ func getEnemyIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*componen
 		textures = append(textures, texture)
 	}
 
-	anim, err := components.NewAnimation(container, textures, time.Second, 0.25)
+	anim, err := components.NewAnimation(container, textures, time.Second, 0.25, sdl.FLIP_HORIZONTAL)
 	if err != nil {
 		return &components.Animation{}, fmt.Errorf("could not create enemy idle animation: \n%v", err)
 	}

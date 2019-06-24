@@ -17,7 +17,7 @@ func NewPlayer(game *engine.Game, r *sdl.Renderer, speed float64, path string) (
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not create player idle animation: \n%v", err)
 	}
-	runAnimation, err := getPlayerRunAnimation(player, r)
+	leftAnim, rightAnim, err := getPlayerRunAnimation(player, r)
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not create player run animation: \n%v", err)
 	}
@@ -27,9 +27,9 @@ func NewPlayer(game *engine.Game, r *sdl.Renderer, speed float64, path string) (
 	var right = "right"
 
 	animations := components.NewAnimations(player)
-	animations.Add(idleAnimation, sdl.FLIP_NONE, idle)
-	animations.Add(runAnimation, sdl.FLIP_HORIZONTAL, left)
-	animations.Add(runAnimation, sdl.FLIP_NONE, right)
+	animations.Add(idleAnimation, idle)
+	animations.Add(leftAnim, left)
+	animations.Add(rightAnim, right)
 	player.AddComponent(animations)
 
 	control := components.NewHorizontalControl(player, speed, getLeftKeys(), getRightKeys())
@@ -64,7 +64,7 @@ func getPlayerIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*compone
 		idleTxt = append(idleTxt, txt)
 	}
 
-	anim, err := components.NewAnimation(container, idleTxt, time.Second, 0.25)
+	anim, err := components.NewAnimation(container, idleTxt, time.Second, 0.25, sdl.FLIP_NONE)
 	if err != nil {
 		return &components.Animation{}, fmt.Errorf("could not create idle animation: \n%v", err)
 	}
@@ -72,25 +72,29 @@ func getPlayerIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*compone
 	return anim, nil
 }
 
-func getPlayerRunAnimation(container *engine.Entity, r *sdl.Renderer) (*components.Animation, error) {
+func getPlayerRunAnimation(container *engine.Entity, r *sdl.Renderer) (left *components.Animation, right *components.Animation, err error) {
 	var runTxt []*sdl.Texture
 
 	for i := 0; i < 10; i++ {
 		path := fmt.Sprintf("assets/ninja/Run__00%d.png", i)
 		txt, err := img.LoadTexture(r, path)
 		if err != nil {
-			return &components.Animation{}, fmt.Errorf("could not load player run texture %v, \n%v", i, err)
+			return &components.Animation{}, &components.Animation{}, fmt.Errorf("could not load player run texture %v, \n%v", i, err)
 		}
 
 		runTxt = append(runTxt, txt)
 	}
 
-	anim, err := components.NewAnimation(container, runTxt, time.Second, 0.25)
+	left, err = components.NewAnimation(container, runTxt, time.Second, 0.25, sdl.FLIP_HORIZONTAL)
 	if err != nil {
-		return &components.Animation{}, fmt.Errorf("could not create run animation: \n%v", err)
+		return &components.Animation{}, &components.Animation{}, fmt.Errorf("could not create run animation: \n%v", err)
+	}
+	right, err = components.NewAnimation(container, runTxt, time.Second, 0.25, sdl.FLIP_NONE)
+	if err != nil {
+		return &components.Animation{}, &components.Animation{}, fmt.Errorf("could not create run animation: \n%v", err)
 	}
 
-	return anim, nil
+	return left, right, nil
 }
 
 func getLeftKeys() []sdl.Scancode {
