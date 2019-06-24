@@ -14,9 +14,7 @@ func NewBackground(game *engine.Game, r *sdl.Renderer, path string) (*engine.Ent
 		return &engine.Entity{}, fmt.Errorf("could not load background image %v: \n%v", path, err)
 	}
 
-	// position, width and height to 0, 0, because fullscreen is used anyway
-	position := engine.NewVector(0, 0)
-	bg := engine.NewEntity(game, position)
+	bg := engine.NewEntity(game)
 
 	renderer := components.NewFullscreenRenderer(bg, r, t)
 	bg.AddComponent(renderer)

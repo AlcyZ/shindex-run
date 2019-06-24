@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/veandco/go-sdl2/sdl"
 )
 
 type Vector struct {
@@ -12,18 +13,34 @@ func NewVector(x float64, y float64) Vector {
 	return Vector{X: x, Y: y}
 }
 
+type Layout struct {
+	Texture *sdl.Texture
+	Width   int32
+	Height  int32
+	Flip    sdl.RendererFlip
+}
+
+func NewLayout(texture *sdl.Texture, width int32, height int32, flip sdl.RendererFlip) *Layout {
+	return &Layout{
+		Texture: texture,
+		Width:   width,
+		Height:  height,
+		Flip:    flip,
+	}
+}
+
 type Entity struct {
 	game       *Game
 	position   Vector
+	layout     *Layout
 	components map[ComponentId]Component
 }
 
-func NewEntity(game *Game, position Vector) *Entity {
+func NewEntity(game *Game) *Entity {
 	var components = make(map[ComponentId]Component)
 
 	return &Entity{
 		game:       game,
-		position:   position,
 		components: components,
 	}
 }
@@ -55,8 +72,20 @@ func (e *Entity) ChangePosition(position Vector) {
 	e.position = position
 }
 
+func (e *Entity) ChangeLayout(layout *Layout) {
+	e.layout = layout
+}
+
 func (e *Entity) CurrentPosition() Vector {
 	return e.position
+}
+
+func (e *Entity) CurrentLayout() *Layout {
+	return e.layout
+}
+
+func (e *Entity) CanRendered() bool {
+	return e.position != Vector{} && e.layout != nil
 }
 
 func (e *Entity) GetDelta() float64 {

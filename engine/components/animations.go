@@ -35,7 +35,7 @@ func (a *Animations) Add(animation *Animation, t AnimationType) {
 	}
 }
 
-func (a *Animations) Layout(t AnimationType) *Layout {
+func (a *Animations) Layout(t AnimationType) *engine.Layout {
 	return a.animations[a.current].Layout()
 }
 

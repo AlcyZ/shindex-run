@@ -9,16 +9,9 @@ import (
 
 const AnimationId engine.ComponentId = "Animation"
 
-type Layout struct {
-	texture *sdl.Texture
-	width   int32
-	height  int32
-	flip    sdl.RendererFlip
-}
-
 type Animation struct {
 	container       *engine.Entity
-	layouts         []*Layout
+	layouts         []*engine.Layout
 	lastChange      time.Time
 	changeRate      time.Duration
 	animationFrames int
@@ -27,7 +20,7 @@ type Animation struct {
 }
 
 func NewAnimation(container *engine.Entity, textures []*sdl.Texture, duration time.Duration, scaling float64, flip sdl.RendererFlip) (*Animation, error) {
-	var layouts []*Layout
+	var layouts []*engine.Layout
 	frames := len(textures)
 
 	for _, texture := range textures {
@@ -36,12 +29,12 @@ func NewAnimation(container *engine.Entity, textures []*sdl.Texture, duration ti
 			return &Animation{}, fmt.Errorf("could not query widht and height from texture: \n%v", err)
 		}
 
-		layout := &Layout{
-			texture: texture,
-			width:   int32(float64(width) * scaling),
-			height:  int32(float64(height) * scaling),
-			flip:    flip,
-		}
+		layout := engine.NewLayout(
+			texture,
+			int32(float64(width)*scaling),
+			int32(float64(height)*scaling),
+			flip,
+		)
 		layouts = append(layouts, layout)
 	}
 
@@ -60,11 +53,12 @@ func (a *Animation) Id() engine.ComponentId {
 
 func (a *Animation) Update() error {
 	a.checkIndex()
+	a.container.ChangeLayout(a.Layout())
 
 	return nil
 }
 
-func (a *Animation) Layout() *Layout {
+func (a *Animation) Layout() *engine.Layout {
 	return a.layouts[a.currentIndex]
 }
 

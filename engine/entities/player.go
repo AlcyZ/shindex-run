@@ -11,7 +11,8 @@ import (
 
 func NewPlayer(game *engine.Game, r *sdl.Renderer, speed float64, path string) (*engine.Entity, error) {
 	initPos := engine.NewVector(50, engine.ScreenHeight-220)
-	player := engine.NewEntity(game, initPos)
+	player := engine.NewEntity(game)
+	player.ChangePosition(initPos)
 
 	idleAnimation, err := getPlayerIdleAnimation(player, r)
 	if err != nil {
@@ -21,24 +22,26 @@ func NewPlayer(game *engine.Game, r *sdl.Renderer, speed float64, path string) (
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not create player run animation: \n%v", err)
 	}
-
-	var idle = "idle"
-	var left = "left"
-	var right = "right"
+	attack, attackAnim, err := newAttack(player, r)
+	if err != nil {
+		return &engine.Entity{}, fmt.Errorf("could not create player attack: \n%v", err)
+	}
 
 	animations := components.NewAnimations(player)
-	animations.Add(idleAnimation, idle)
-	animations.Add(leftAnim, left)
-	animations.Add(rightAnim, right)
+	animations.Add(idleAnimation, "idle")
+	animations.Add(leftAnim, "left")
+	animations.Add(rightAnim, "right")
+	animations.Add(attackAnim, "attack")
 	player.AddComponent(animations)
 
 	control := components.NewHorizontalControl(player, speed, getLeftKeys(), getRightKeys())
-	err = control.WithAnimations(idle, left, right) // animations must be attach to player component first
+	err = control.WithAnimations("idle", "left", "right") // animations must be attach to player component first
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not add animations to horizontal control: \n%v", err)
 	}
-
 	player.AddComponent(control)
+
+	player.AddComponent(attack)
 
 	// the render component should be the last attached, because its very likely that other components updates the
 	// internal state to be rendered
@@ -95,6 +98,25 @@ func getPlayerRunAnimation(container *engine.Entity, r *sdl.Renderer) (left *com
 	}
 
 	return left, right, nil
+}
+
+func newAttack(container *engine.Entity, r *sdl.Renderer) (*components.Attack, *components.Animation, error) {
+	var attackTextures []*sdl.Texture
+	for i := 0; i < 10; i++ {
+		path := fmt.Sprintf("assets/ninja/Attack__00%d.png", i)
+		texture, err := img.LoadTexture(r, path)
+		if err != nil {
+			return &components.Attack{}, &components.Animation{}, fmt.Errorf("could not load attack texture: %v", err)
+		}
+		attackTextures = append(attackTextures, texture)
+	}
+
+	animation, err := components.NewAnimation(container, attackTextures, 1, 0.25, sdl.FLIP_NONE)
+	if err != nil {
+		return &components.Attack{}, &components.Animation{}, fmt.Errorf("could not create attack animation: %v", err)
+	}
+
+	return components.NewAttack(container, animation), animation, nil
 }
 
 func getLeftKeys() []sdl.Scancode {

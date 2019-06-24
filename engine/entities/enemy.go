@@ -11,21 +11,22 @@ import (
 
 func NewEnemy(game *engine.Game, r *sdl.Renderer, path string) (*engine.Entity, error) {
 	initPos := engine.NewVector(engine.ScreenWidth-150, engine.ScreenHeight-240)
-	player := engine.NewEntity(game, initPos)
+	enemy := engine.NewEntity(game)
+	enemy.ChangePosition(initPos)
 
-	animation, err := getEnemyIdleAnimation(player, r)
+	animation, err := getEnemyIdleAnimation(enemy, r)
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not create enemy idle animation: \n%v", err)
 	}
-	player.AddComponent(animation)
+	enemy.AddComponent(animation)
 
-	renderer, err := components.NewAnimationRenderer(player, r)
+	renderer, err := components.NewAnimationRenderer(enemy, r)
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not create animation renderer: \n%v", err)
 	}
-	player.AddComponent(renderer)
+	enemy.AddComponent(renderer)
 
-	return player, nil
+	return enemy, nil
 }
 
 func getEnemyIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*components.Animation, error) {

@@ -32,20 +32,20 @@ func (r *animationsRenderer) Id() engine.ComponentId {
 }
 
 func (r *animationsRenderer) Update() error {
-	t := r.a.current
-	position := r.container.CurrentPosition()
-	layout := r.a.Layout(t)
+	if r.container.CanRendered() {
+		position := r.container.CurrentPosition()
+		layout := r.container.CurrentLayout()
 
-	dest := &sdl.Rect{
-		X: int32(position.X),
-		Y: int32(position.Y),
-		W: layout.width,
-		H: layout.height,
+		dest := &sdl.Rect{
+			X: int32(position.X),
+			Y: int32(position.Y),
+			W: layout.Width,
+			H: layout.Height,
+		}
+
+		if err := r.r.CopyEx(layout.Texture, nil, dest, 0, nil, layout.Flip); err != nil {
+			return fmt.Errorf("could not render texture to window: \n%v", err)
+		}
 	}
-
-	if err := r.r.CopyEx(layout.texture, nil, dest, 0, nil, layout.flip); err != nil {
-		return fmt.Errorf("could not render texture to window: \n%v", err)
-	}
-
 	return nil
 }

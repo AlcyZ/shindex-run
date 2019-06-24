@@ -28,11 +28,11 @@ func main() {
 		return
 	}
 	defer soundStream.Close()
-	soundStream.Close()
+	//soundStream.Close()
 
 	game := engine.CreateSimpleGame(w, r)
 
-	player, err := gameEntities.NewPlayer(game, r, 16, "assets/ninja/Idle__000.png")
+	player, err := gameEntities.NewPlayer(game, r, 10, "assets/ninja/Idle__000.png")
 	if err != nil {
 		fmt.Println("player init failed:\n", err)
 		return
