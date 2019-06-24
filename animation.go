@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 	"time"
 )
 
-const AnimationId = "animation"
+const AnimationId engine.ComponentId = "animation"
 
 type layout struct {
 	texture *sdl.Texture
@@ -15,7 +16,7 @@ type layout struct {
 }
 
 type animation struct {
-	container       *entity
+	container       *engine.Entity
 	layouts         []*layout
 	lastChange      time.Time
 	changeRate      time.Duration
@@ -24,7 +25,7 @@ type animation struct {
 	currentIndex    int
 }
 
-func newAnimation(container *entity, textures []*sdl.Texture, duration time.Duration, scaling float64) (*animation, error) {
+func newAnimation(container *engine.Entity, textures []*sdl.Texture, duration time.Duration, scaling float64) (*animation, error) {
 	var layouts []*layout
 	frames := len(textures)
 
@@ -51,11 +52,11 @@ func newAnimation(container *entity, textures []*sdl.Texture, duration time.Dura
 	}, nil
 }
 
-func (a *animation) id() componentId {
+func (a *animation) Id() engine.ComponentId {
 	return AnimationId
 }
 
-func (a *animation) update() error {
+func (a *animation) Update() error {
 	a.checkIndex()
 
 	return nil

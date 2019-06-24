@@ -2,23 +2,29 @@ package main
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 )
 
 type animationType = string
 
-const AnimationsId componentId = "animations"
+const AnimationsId engine.ComponentId = "animations"
 
 type animations struct {
+	container  *engine.Entity
 	animations map[animationType]*animation
 	flips      map[animationType]sdl.RendererFlip
 	current    animationType
 }
 
-func newAnimations() *animations {
+func newAnimations(container *engine.Entity) *animations {
 	a := make(map[animationType]*animation)
 	flips := make(map[animationType]sdl.RendererFlip)
 
-	return &animations{animations: a, flips: flips}
+	return &animations{
+		container:  container,
+		animations: a,
+		flips:      flips,
+	}
 }
 
 func (a *animations) add(animation *animation, flip sdl.RendererFlip, t animationType) {
@@ -41,11 +47,11 @@ func (a *animations) changeAnimation(t animationType) {
 	}
 }
 
-func (a *animations) id() componentId {
+func (a *animations) Id() engine.ComponentId {
 	return AnimationsId
 }
 
-func (a *animations) update() error {
-	_ = a.animations[a.current].update()
+func (a *animations) Update() error {
+	_ = a.animations[a.current].Update()
 	return nil
 }

@@ -3,15 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 )
 
 type fullscreenRenderer struct {
-	container *entity
+	container *engine.Entity
 	renderer  *sdl.Renderer
 	texture   *sdl.Texture
 }
 
-func newFullscreenRenderer(container *entity, renderer *sdl.Renderer, texture *sdl.Texture) *fullscreenRenderer {
+func newFullscreenRenderer(container *engine.Entity, renderer *sdl.Renderer, texture *sdl.Texture) *fullscreenRenderer {
 	return &fullscreenRenderer{
 		container: container,
 		renderer:  renderer,
@@ -19,7 +20,7 @@ func newFullscreenRenderer(container *entity, renderer *sdl.Renderer, texture *s
 	}
 }
 
-func (r *fullscreenRenderer) update() error {
+func (r *fullscreenRenderer) Update() error {
 	if err := r.renderer.Copy(r.texture, nil, nil); err != nil {
 		return fmt.Errorf("could not render fullscreen texture: \n%v", err)
 	}
@@ -27,18 +28,18 @@ func (r *fullscreenRenderer) update() error {
 	return nil
 }
 
-func (r *fullscreenRenderer) id() componentId {
+func (r *fullscreenRenderer) Id() engine.ComponentId {
 	return "fullscreen_renderer"
 }
 
 type animationRenderer struct {
-	container *entity
+	container *engine.Entity
 	renderer  *sdl.Renderer
 	animation *animation
 }
 
-func newAnimationRenderer(container *entity, r *sdl.Renderer) (*animationRenderer, error) {
-	anim, err := container.getComponent(AnimationId)
+func newAnimationRenderer(container *engine.Entity, r *sdl.Renderer) (*animationRenderer, error) {
+	anim, err := container.GetComponent(AnimationId)
 	if err != nil {
 		return &animationRenderer{}, fmt.Errorf("could not create animation renderer: \n%v", err)
 	}
@@ -50,15 +51,16 @@ func newAnimationRenderer(container *entity, r *sdl.Renderer) (*animationRendere
 	}, nil
 }
 
-func (r *animationRenderer) id() componentId {
+func (r *animationRenderer) Id() engine.ComponentId {
 	return "fullscreen_renderer"
 }
 
-func (r *animationRenderer) update() error {
+func (r *animationRenderer) Update() error {
 	layout := r.animation.layout()
+	position := r.container.CurrentPosition()
 	dest := &sdl.Rect{
-		X: int32(r.container.position.x),
-		Y: int32(r.container.position.y),
+		X: int32(position.X),
+		Y: int32(position.Y),
 		W: layout.width,
 		H: layout.height,
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 )
 
 const (
@@ -13,7 +14,7 @@ const (
 )
 
 type horizontalControl struct {
-	container        *entity
+	container        *engine.Entity
 	speed            float64
 	leftKeys         []sdl.Scancode
 	rightKeys        []sdl.Scancode
@@ -21,7 +22,7 @@ type horizontalControl struct {
 	animationMapping map[string]animationType
 }
 
-func newHorizontalControl(container *entity, speed float64, leftKeys []sdl.Scancode, rightKeys []sdl.Scancode) *horizontalControl {
+func newHorizontalControl(container *engine.Entity, speed float64, leftKeys []sdl.Scancode, rightKeys []sdl.Scancode) *horizontalControl {
 	return &horizontalControl{
 		container: container,
 		speed:     speed,
@@ -32,7 +33,7 @@ func newHorizontalControl(container *entity, speed float64, leftKeys []sdl.Scanc
 }
 
 func (c *horizontalControl) withAnimations(idle animationType, left animationType, right animationType) error {
-	_, err := c.container.getComponent(AnimationsId)
+	_, err := c.container.GetComponent(AnimationsId)
 	if err != nil {
 		return fmt.Errorf("animations not available on container entity: %v", err)
 	}
@@ -47,27 +48,27 @@ func (c *horizontalControl) withAnimations(idle animationType, left animationTyp
 	return nil
 }
 
-func (c *horizontalControl) id() componentId {
+func (c *horizontalControl) Id() engine.ComponentId {
 	return HorizontalControlId
 }
 
-func (c *horizontalControl) update() error {
+func (c *horizontalControl) Update() error {
 	keys := sdl.GetKeyboardState()
-	position := c.container.position
+	position := c.container.CurrentPosition()
 	leftKeyPressed := false
 	rightKeyPressed := false
 	nonOrBoth := false
 
 	for _, lScanCode := range c.leftKeys {
 		if !leftKeyPressed && keys[lScanCode] == 1 {
-			c.container.position.x = position.x - c.speed*delta
+			c.container.ChangePosition(engine.NewVector(position.X-c.speed*delta, position.Y))
 			leftKeyPressed = true
 			c.changeAnimation(mappingKeyLeft)
 		}
 	}
 	for _, rScanCode := range c.rightKeys {
 		if !rightKeyPressed && keys[rScanCode] == 1 {
-			c.container.position.x = position.x + c.speed*delta
+			c.container.ChangePosition(engine.NewVector(position.X+c.speed*delta, position.Y))
 			rightKeyPressed = true
 			c.changeAnimation(mappingKeyRight)
 		}
@@ -85,7 +86,7 @@ func (c *horizontalControl) update() error {
 func (c *horizontalControl) changeAnimation(t string) {
 	if c.animated {
 		//a if animated is true, the animations component must be available
-		comp, _ := c.container.getComponent(AnimationsId)
+		comp, _ := c.container.GetComponent(AnimationsId)
 		comp.(*animations).changeAnimation(c.animationMapping[t])
 	}
 }

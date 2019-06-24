@@ -4,52 +4,53 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 	"time"
 )
 
-func newPlayer(r *sdl.Renderer, speed float64, path string) (*entity, error) {
-	initPos := vector{x: 50, y: screenHeight - 220}
-	player := newEntity(initPos)
+func newPlayer(r *sdl.Renderer, speed float64, path string) (*engine.Entity, error) {
+	initPos := engine.NewVector(50, screenHeight-220)
+	player := engine.NewEntity(initPos)
 
 	idleAnimation, err := getPlayerIdleAnimation(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create player idle animation: \n%v", err)
+		return &engine.Entity{}, fmt.Errorf("could not create player idle animation: \n%v", err)
 	}
 	runAnimation, err := getPlayerRunAnimation(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create player run animation: \n%v", err)
+		return &engine.Entity{}, fmt.Errorf("could not create player run animation: \n%v", err)
 	}
 
 	var idle = "idle"
 	var left = "left"
 	var right = "right"
 
-	animations := newAnimations()
+	animations := newAnimations(player)
 	animations.add(idleAnimation, sdl.FLIP_NONE, idle)
 	animations.add(runAnimation, sdl.FLIP_HORIZONTAL, left)
 	animations.add(runAnimation, sdl.FLIP_NONE, right)
-	player.addComponent(animations)
+	player.AddComponent(animations)
 
 	control := newHorizontalControl(player, speed, getLeftKeys(), getRightKeys())
 	err = control.withAnimations(idle, left, right) // animations must be attach to player component first
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not add animations to horizontal control: \n%v", err)
+		return &engine.Entity{}, fmt.Errorf("could not add animations to horizontal control: \n%v", err)
 	}
 
-	player.addComponent(control)
+	player.AddComponent(control)
 
 	// the render component should be the last attached, because its very likely that other components updates the
 	// internal state to be rendered
 	renderer, err := newAnimationsRenderer(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create animations renderer: \n%v", err)
+		return &engine.Entity{}, fmt.Errorf("could not create animations renderer: \n%v", err)
 	}
-	player.addComponent(renderer)
+	player.AddComponent(renderer)
 
 	return player, nil
 }
 
-func getPlayerIdleAnimation(container *entity, r *sdl.Renderer) (*animation, error) {
+func getPlayerIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*animation, error) {
 	var idleTxt []*sdl.Texture
 
 	for i := 0; i < 10; i++ {
@@ -70,7 +71,7 @@ func getPlayerIdleAnimation(container *entity, r *sdl.Renderer) (*animation, err
 	return anim, nil
 }
 
-func getPlayerRunAnimation(container *entity, r *sdl.Renderer) (*animation, error) {
+func getPlayerRunAnimation(container *engine.Entity, r *sdl.Renderer) (*animation, error) {
 	var runTxt []*sdl.Texture
 
 	for i := 0; i < 10; i++ {

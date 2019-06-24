@@ -4,29 +4,30 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 	"time"
 )
 
-func newEnemy(r *sdl.Renderer, path string) (*entity, error) {
-	initPos := vector{x: screenWidth - 150, y: screenHeight - 240}
-	player := newEntity(initPos)
+func newEnemy(r *sdl.Renderer, path string) (*engine.Entity, error) {
+	initPos := engine.NewVector(screenWidth-150, screenHeight-240)
+	player := engine.NewEntity(initPos)
 
 	animation, err := getEnemyIdleAnimation(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create enemy idle animation: \n%v", err)
+		return &engine.Entity{}, fmt.Errorf("could not create enemy idle animation: \n%v", err)
 	}
-	player.addComponent(animation)
+	player.AddComponent(animation)
 
 	renderer, err := newAnimationRenderer(player, r)
 	if err != nil {
-		return &entity{}, fmt.Errorf("could not create animation renderer: \n%v", err)
+		return &engine.Entity{}, fmt.Errorf("could not create animation renderer: \n%v", err)
 	}
-	player.addComponent(renderer)
+	player.AddComponent(renderer)
 
 	return player, nil
 }
 
-func getEnemyIdleAnimation(container *entity, r *sdl.Renderer) (*animation, error) {
+func getEnemyIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*animation, error) {
 	var textures []*sdl.Texture
 
 	for i := 0; i < 15; i++ {

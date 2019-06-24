@@ -3,18 +3,19 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"shindex-run/engine"
 )
 
 const AnimationsRendererId = "animations_renderer"
 
 type animationsRenderer struct {
-	container *entity
+	container *engine.Entity
 	r         *sdl.Renderer
 	a         *animations
 }
 
-func newAnimationsRenderer(container *entity, r *sdl.Renderer) (*animationsRenderer, error) {
-	a, err := container.getComponent(AnimationsId)
+func newAnimationsRenderer(container *engine.Entity, r *sdl.Renderer) (*animationsRenderer, error) {
+	a, err := container.GetComponent(AnimationsId)
 	if err != nil {
 		return &animationsRenderer{}, fmt.Errorf("could not get component:\n%v", err)
 	}
@@ -26,18 +27,19 @@ func newAnimationsRenderer(container *entity, r *sdl.Renderer) (*animationsRende
 	}, nil
 }
 
-func (r *animationsRenderer) id() componentId {
+func (r *animationsRenderer) Id() engine.ComponentId {
 	return AnimationsRendererId
 }
 
-func (r *animationsRenderer) update() error {
+func (r *animationsRenderer) Update() error {
 	t := r.a.current
+	position := r.container.CurrentPosition()
 	layout := r.a.layout(t)
 	flip := r.a.flips[t]
 
 	dest := &sdl.Rect{
-		X: int32(r.container.position.x),
-		Y: int32(r.container.position.y),
+		X: int32(position.X),
+		Y: int32(position.Y),
 		W: layout.width,
 		H: layout.height,
 	}

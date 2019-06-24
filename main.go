@@ -7,6 +7,7 @@ import (
 	"github.com/faiface/beep/speaker"
 	"github.com/veandco/go-sdl2/sdl"
 	"os"
+	"shindex-run/engine"
 	"time"
 )
 
@@ -19,7 +20,7 @@ const (
 )
 
 var delta float64
-var entities []*entity
+var entities []*engine.Entity
 
 //var sys [] systems.System
 
@@ -99,7 +100,7 @@ func main() {
 		_ = r.Clear()
 
 		for _, entity := range entities {
-			if err := entity.update(); err != nil {
+			if err := entity.Update(); err != nil {
 				fmt.Println("could not update entity: ", err)
 			}
 		}
