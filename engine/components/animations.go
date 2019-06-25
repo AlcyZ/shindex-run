@@ -14,6 +14,7 @@ type Animations struct {
 	animations map[AnimationType]*Animation
 	flips      map[AnimationType]sdl.RendererFlip
 	current    AnimationType
+	locked     bool
 }
 
 func NewAnimations(container *engine.Entity) *Animations {
@@ -40,10 +41,19 @@ func (a *Animations) Layout(t AnimationType) *engine.Layout {
 }
 
 func (a *Animations) ChangeAnimation(t AnimationType) {
-	if a.current != t {
+	if !a.locked && a.current != t {
 		a.animations[a.current].currentIndex = 0
 		a.current = t
 	}
+}
+
+func (a *Animations) SingleAnimation(t AnimationType) {
+	a.ChangeAnimation(t)
+	a.locked = true
+}
+
+func (a *Animations) Unlock() {
+	a.locked = false
 }
 
 func (a *Animations) Id() engine.ComponentId {

@@ -66,9 +66,17 @@ func (a *Animation) checkIndex() {
 	if time.Since(a.lastChange) > time.Since(time.Now())+a.changeRate {
 		if a.currentIndex >= a.animationFrames-1 {
 			a.currentIndex = 0
+			a.onReset()
 		} else {
 			a.currentIndex++
 		}
 		a.lastChange = time.Now()
+	}
+}
+
+func (a *Animation) onReset() {
+	animations, err := a.container.GetComponent(AnimationsId)
+	if err == nil {
+		animations.(*Animations).Unlock()
 	}
 }

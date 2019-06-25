@@ -111,7 +111,7 @@ func newAttack(container *engine.Entity, r *sdl.Renderer) (*components.Attack, *
 		attackTextures = append(attackTextures, texture)
 	}
 
-	animation, err := components.NewAnimation(container, attackTextures, 1, 0.25, sdl.FLIP_NONE)
+	animation, err := components.NewAnimation(container, attackTextures, time.Second/3, 0.25, sdl.FLIP_NONE)
 	if err != nil {
 		return &components.Attack{}, &components.Animation{}, fmt.Errorf("could not create attack animation: %v", err)
 	}

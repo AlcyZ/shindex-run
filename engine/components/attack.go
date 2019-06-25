@@ -1,10 +1,8 @@
 package components
 
 import (
-	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"shindex-run/engine"
-	"time"
 )
 
 const AttackId engine.ComponentId = "attack"
@@ -36,12 +34,7 @@ func (a *Attack) Update() error {
 }
 
 func (a *Attack) onAttack() {
-
-	// Todo: Buggy state here .. continue
-	fmt.Println("bam", time.Now())
-	comp, _ := a.container.GetComponent(AnimationsId)
-	comp.(*Animations).ChangeAnimation("attack")
-
 	// do cool attack animation
-
+	comp, _ := a.container.GetComponent(AnimationsId)
+	comp.(*Animations).SingleAnimation("attack")
 }
