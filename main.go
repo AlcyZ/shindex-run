@@ -28,7 +28,7 @@ func main() {
 		return
 	}
 	defer soundStream.Close()
-	//soundStream.Close()
+	soundStream.Close()
 
 	game := engine.CreateSimpleGame(w, r)
 

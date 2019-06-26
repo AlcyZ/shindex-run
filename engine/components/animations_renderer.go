@@ -43,7 +43,7 @@ func (r *animationsRenderer) Update() error {
 			H: layout.Height,
 		}
 
-		if err := r.r.CopyEx(layout.Texture, nil, dest, 0, nil, layout.Flip); err != nil {
+		if err := r.r.CopyEx(layout.Texture, nil, dest, 0, nil, r.container.CurrentFlip()); err != nil {
 			return fmt.Errorf("could not render texture to window: \n%v", err)
 		}
 	}

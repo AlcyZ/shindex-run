@@ -1,7 +1,6 @@
 package components
 
 import (
-	"github.com/veandco/go-sdl2/sdl"
 	"shindex-run/engine"
 )
 
@@ -12,19 +11,16 @@ const AnimationsId engine.ComponentId = "Animations"
 type Animations struct {
 	container  *engine.Entity
 	animations map[AnimationType]*Animation
-	flips      map[AnimationType]sdl.RendererFlip
 	current    AnimationType
 	locked     bool
 }
 
 func NewAnimations(container *engine.Entity) *Animations {
 	a := make(map[AnimationType]*Animation)
-	flips := make(map[AnimationType]sdl.RendererFlip)
 
 	return &Animations{
 		container:  container,
 		animations: a,
-		flips:      flips,
 	}
 }
 

@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+const (
+	idle  = "idle"
+	left  = "left"
+	right = "right"
+)
+
 func NewPlayer(game *engine.Game, r *sdl.Renderer, speed float64, path string) (*engine.Entity, error) {
 	initPos := engine.NewVector(50, engine.ScreenHeight-220)
 	player := engine.NewEntity(game)
@@ -28,14 +34,21 @@ func NewPlayer(game *engine.Game, r *sdl.Renderer, speed float64, path string) (
 	}
 
 	animations := components.NewAnimations(player)
-	animations.Add(idleAnimation, "idle")
-	animations.Add(leftAnim, "left")
-	animations.Add(rightAnim, "right")
+	animations.Add(idleAnimation, idle)
+	animations.Add(leftAnim, left)
+	animations.Add(rightAnim, right)
 	animations.Add(attackAnim, "attack")
 	player.AddComponent(animations)
 
+	flips := components.NewFlips(player)
+	flips.Add(sdl.FLIP_NONE, idle)
+	flips.Add(sdl.FLIP_HORIZONTAL, left)
+	flips.Add(sdl.FLIP_NONE, right)
+	player.AddComponent(flips)
+
 	control := components.NewHorizontalControl(player, speed, getLeftKeys(), getRightKeys())
-	err = control.WithAnimations("idle", "left", "right") // animations must be attach to player component first
+	err = control.WithAnimations(idle, left, right) // animations must be attach to player component first
+	err = control.WithFlips(idle, left, right)
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not add animations to horizontal control: \n%v", err)
 	}
@@ -67,7 +80,7 @@ func getPlayerIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*compone
 		idleTxt = append(idleTxt, txt)
 	}
 
-	anim, err := components.NewAnimation(container, idleTxt, time.Second, 0.25, sdl.FLIP_NONE)
+	anim, err := components.NewAnimation(container, idleTxt, time.Second, 0.25)
 	if err != nil {
 		return &components.Animation{}, fmt.Errorf("could not create idle animation: \n%v", err)
 	}
@@ -88,11 +101,11 @@ func getPlayerRunAnimation(container *engine.Entity, r *sdl.Renderer) (left *com
 		runTxt = append(runTxt, txt)
 	}
 
-	left, err = components.NewAnimation(container, runTxt, time.Second, 0.25, sdl.FLIP_HORIZONTAL)
+	left, err = components.NewAnimation(container, runTxt, time.Second, 0.25)
 	if err != nil {
 		return &components.Animation{}, &components.Animation{}, fmt.Errorf("could not create run animation: \n%v", err)
 	}
-	right, err = components.NewAnimation(container, runTxt, time.Second, 0.25, sdl.FLIP_NONE)
+	right, err = components.NewAnimation(container, runTxt, time.Second, 0.25)
 	if err != nil {
 		return &components.Animation{}, &components.Animation{}, fmt.Errorf("could not create run animation: \n%v", err)
 	}
@@ -111,7 +124,7 @@ func newAttack(container *engine.Entity, r *sdl.Renderer) (*components.Attack, *
 		attackTextures = append(attackTextures, texture)
 	}
 
-	animation, err := components.NewAnimation(container, attackTextures, time.Second/3, 0.25, sdl.FLIP_NONE)
+	animation, err := components.NewAnimation(container, attackTextures, time.Second/3, 0.25)
 	if err != nil {
 		return &components.Attack{}, &components.Animation{}, fmt.Errorf("could not create attack animation: %v", err)
 	}

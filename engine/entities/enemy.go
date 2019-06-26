@@ -20,6 +20,8 @@ func NewEnemy(game *engine.Game, r *sdl.Renderer, path string) (*engine.Entity, 
 	}
 	enemy.AddComponent(animation)
 
+	enemy.ChangeFlip(sdl.FLIP_HORIZONTAL)
+
 	renderer, err := components.NewAnimationRenderer(enemy, r)
 	if err != nil {
 		return &engine.Entity{}, fmt.Errorf("could not create animation renderer: \n%v", err)
@@ -41,7 +43,7 @@ func getEnemyIdleAnimation(container *engine.Entity, r *sdl.Renderer) (*componen
 		textures = append(textures, texture)
 	}
 
-	anim, err := components.NewAnimation(container, textures, time.Second, 0.25, sdl.FLIP_HORIZONTAL)
+	anim, err := components.NewAnimation(container, textures, time.Second, 0.25)
 	if err != nil {
 		return &components.Animation{}, fmt.Errorf("could not create enemy idle animation: \n%v", err)
 	}

@@ -39,7 +39,7 @@ func (r *AnimationRenderer) Update() error {
 			W: layout.Width,
 			H: layout.Height,
 		}
-		if err := r.renderer.CopyEx(layout.Texture, nil, dest, 0, nil, layout.Flip); err != nil {
+		if err := r.renderer.CopyEx(layout.Texture, nil, dest, 0, nil, r.container.CurrentFlip()); err != nil {
 			return fmt.Errorf("could not render fullscreen texture: \n%v", err)
 		}
 	}

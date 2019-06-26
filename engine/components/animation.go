@@ -19,7 +19,7 @@ type Animation struct {
 	currentIndex    int
 }
 
-func NewAnimation(container *engine.Entity, textures []*sdl.Texture, duration time.Duration, scaling float64, flip sdl.RendererFlip) (*Animation, error) {
+func NewAnimation(container *engine.Entity, textures []*sdl.Texture, duration time.Duration, scaling float64) (*Animation, error) {
 	var layouts []*engine.Layout
 	frames := len(textures)
 
@@ -33,7 +33,6 @@ func NewAnimation(container *engine.Entity, textures []*sdl.Texture, duration ti
 			texture,
 			int32(float64(width)*scaling),
 			int32(float64(height)*scaling),
-			flip,
 		)
 		layouts = append(layouts, layout)
 	}
